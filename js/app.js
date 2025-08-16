@@ -162,11 +162,13 @@ function expandRange(range, getMaxVerse){
 // ===== 3) 복사본 생성 (줄 포맷: "책 장:절  본문") =====
 function buildClipboardText(book, points, getVerse){
   const lines = [];
-  for(const p of points){
+  for (const p of points) {
     const body = getVerse(String(p.c), String(p.v));
-    if(body) lines.push(`${body}`);
-//    if(body) lines.push(`${book} ${p.c}:${p.v}  ${body}`);
+    if (!body) continue;
+    // ✅ 장:절/책이름 제거 → 본문만
+    lines.push(String(body).trim());
   }
+  // 여러 줄 본문을 그대로 복사
   return lines.join('\n');
 }
 
@@ -226,6 +228,7 @@ el.form.addEventListener('submit', async (e)=>{
 });
 
 // Enter 키는 form submit으로 자동 처리
+
 
 
 
