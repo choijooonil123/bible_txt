@@ -107,7 +107,7 @@ async function loadBookText(bookName){
   if(cache.has(bookName)) return cache.get(bookName);
 
   // 폴더와 파일명 모두 안전 인코딩
-  const folder = encodeURIComponent('개역개정');
+  const folder = encodeURIComponent('bible_1');
   const file   = encodeURIComponent(bookName) + '.txt';
   const url    = `./${folder}/${file}`;
 
@@ -225,4 +225,5 @@ el.form.addEventListener('submit', async (e)=>{
 });
 
 // Enter 키는 form submit으로 자동 처리
+
 
