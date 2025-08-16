@@ -100,12 +100,27 @@ function parseReference(raw){
 
 // ===== 2) /개역개정/{책}.txt 로더 (장:절  공백/탭  본문) =====
 const cache = new Map();
+// 기존:
+// const url = `./개역개정/${encodeURIComponent(bookName)}.txt`;
+
 async function loadBookText(bookName){
   if(cache.has(bookName)) return cache.get(bookName);
-  const url = `./개역개정/${encodeURIComponent(bookName)}.txt`;
+
+  // 폴더와 파일명 모두 안전 인코딩
+  const folder = encodeURIComponent('개역개정');
+  const file   = encodeURIComponent(bookName) + '.txt';
+  const url    = `./${folder}/${file}`;
+
+  // 상태 표시(디버깅에도 도움)
+  const statusEl = document.getElementById('status');
+  if (statusEl) statusEl.textContent = `불러오는 중: ${decodeURIComponent(url)}`;
+
   const res = await fetch(url);
-  if(!res.ok) throw new Error(`"${bookName}" 데이터를 불러오지 못했습니다.`);
-  const text = await res.text(); // 파일은 UTF-8로 저장해야 함
+  if(!res.ok){
+    // 404 등일 때 즉시 이유 보여주기
+    throw new Error(`데이터 불러오기 실패(HTTP ${res.status}) · 경로 확인: ${decodeURIComponent(url)}`);
+  }
+  const text = await res.text(); // 파일은 UTF-8이어야 함
 
   const chapters = {};
   text.split(/\r?\n/).forEach(line => {
@@ -116,9 +131,11 @@ async function loadBookText(bookName){
     const ch = m[1], vs = m[2], body = m[3];
     (chapters[ch] ||= {})[vs] = body;
   });
+
   cache.set(bookName, chapters);
   return chapters;
 }
+
 
 function createAccessors(book){
   const maxVerse = ch => {
@@ -208,3 +225,4 @@ el.form.addEventListener('submit', async (e)=>{
 });
 
 // Enter 키는 form submit으로 자동 처리
+
